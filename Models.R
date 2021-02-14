@@ -5,12 +5,14 @@
 # modelType: name of the model used choose from the classification models of caret at:
 #            http://topepo.github.io/caret/train-models-by-tag.html#Support_Vector_Machines
 # seed: seed used for the computation
-train_model <- function(dataset, tuningGrid, modelType, seed){
+train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
 
   #compute 10-fold validation for the selected model
   #-----------------------
 
   set.seed(seed)
+  filename <- paste0("Logs/", mType, "/", modelType, "_", dType, ".log")
+  sink(filename)
   
   train_control <- trainControl(method="repeatedcv", #repeated cross validation to decrease variance
                                 number=10, # 10 folds
@@ -26,7 +28,6 @@ train_model <- function(dataset, tuningGrid, modelType, seed){
                    tuneGrid=tuningGrid,
                    trControl=train_control)
 
-    print(model)
   } else { # default tuning otherwise
     
     model <- train(diagnosis ~.,
@@ -34,15 +35,17 @@ train_model <- function(dataset, tuningGrid, modelType, seed){
                    method=modelType,
                    trControl=train_control)
   }
+
+  cat(toString(model))
   
   #-----------------------
-
+  sink()
   return(model)
   
   #-----------------------
 }
 
-train_models <- function(set, seed) {
+train_models <- function(set, seed, dType) {
   # Initialize processing cluster
   #-----------------------
 
@@ -56,14 +59,21 @@ train_models <- function(set, seed) {
   Bayes.model <- train_model(set,
                            bayes_tuning_grid,
                            'naive_bayes',
-                           seed)
+                           seed,
+                            "Naive_Bayes",
+                             dType
+                  )
 
   SVM.model <- train_model(set,
                          svm_tuning_grid,
                          "svmPoly",
-                         seed)
+                         seed,
+                            "SVM",
+                             dType)
 
-  NN.model <- train_model(set, nn_tuning_grid, 'mlpML', seed)
+  NN.model <- train_model(set, nn_tuning_grid, 'mlpML', seed,
+                            "Neural_Network",
+                             dType)
 
   #Terminate parallel computing and return outputs
   #-----------------------

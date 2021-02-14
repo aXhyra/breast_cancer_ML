@@ -62,14 +62,14 @@ testset.pca <- data.frame(testset[1], computed.pca[2])
 
 #-----------------------
 
-models.norm <- train_models(trainset.norm, Sys.time())
+models.norm <- train_models(trainset.norm, Sys.time(), "Normalized")
 
 analyze_results(models.norm, testset.norm, "Normalized")
 
-models.std <- train_models(trainset.std, Sys.time())
+models.std <- train_models(trainset.std, Sys.time(), "Standardized")
 
 analyze_results(models.std, testset.std, "Standardized")
 
-models.pca <- train_models(trainset.pca, Sys.time())
+models.pca <- train_models(trainset.pca, Sys.time(), "PCA")
 
 analyze_results(models.pca, testset.pca, "PCA")
