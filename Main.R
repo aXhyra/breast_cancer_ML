@@ -141,3 +141,7 @@ save_models_comparisons(models.std, "Standardized")
 models.pca <- train_models(trainset.pca, Sys.time(), "PCA")
 analyze_results(models.pca, testset.pca, "PCA")
 save_models_comparisons(models.pca, "PCA")
+
+models.corr <- train_models(trainset.corr, Sys.time(), "Corr")
+analyze_results(models.corr, testset.corr, "Corr")
+save_models_comparisons(models.corr, "Corr")
