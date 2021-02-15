@@ -2,50 +2,62 @@
 
 # model: caret model (best fit of the 10-fold)
 # testset: test set to perform metrics scores
+# modeltype: name of the used model e.g. Naive_Bayes, SVm...
+# testset_type: type of dataset e.g. normalized, standardized...
 analyze_result <- function(model, testset, modeltype, testset_type){
-
+  
+  # Prepare file to write
+  filename <- paste0("Logs/", modeltype, "/", modeltype, "_", testset_type, "_results", ".log")
+  fileConn<-file(filename)
+  
+  # Make predictions for the test set
   predictions <- predict(model, testset[,! names(testset) %in% "diagnosis"])
-
-  table(predictions, testset[, "diagnosis"])
-
+  
+  # Create confusion matrix
   result <- confusionMatrix(predictions,
                             factor(testset[, "diagnosis"]))
+  
+  # Save confusion matrix in a file
+  write.csv(result$table,paste0("Logs/", modeltype, "/", modeltype, "_", testset_type, "_finalModel_confusion_matrix_test.log"))
+  
+  # Save metrics info about predictions in a file
+  writeLines(c("Accuracy:",
+               result$overall[1],
+               "Kappa:",
+               result$overall[2],
+               "Sensitivity:",
+               result$byClass[1],
+               "Specificity:",
+               result$byClass[2],
+               "Precision:",
+               result$byClass[5],
+               "Recall:",
+               result$byClass[6],
+               "F1:",
+               result$byClass[7]), fileConn)
 
-  result2 <- confusionMatrix(predictions,
-                             factor(testset[, "diagnosis"]),
-                             mode = "prec_recall")
-
-  print(result)
-  print(result2)
-
-  pred.prob <- predict(model,
+  # Get probabilistic predictions for the test set
+  probabilistic.predictions <- predict(model,
                        testset[, ! names(testset) %in% "diagnosis"],
                        type = "prob")
 
-  pred.to.roc <- pred.prob[, 2]
-  pred.rocr <- prediction(pred.to.roc, factor(testset$diagnosis))
-  perf.rocr <- performance(pred.rocr, measure = "auc", x.measure = "cutoff")
-  perf.tpr.rocr <- performance(pred.rocr, "tpr", "fpr")
+  # Perform ROC
+  single.class.probabilities <- probabilistic.predictions[, 2]
+  prediction.result <- prediction(single.class.probabilities, factor(testset$diagnosis))
+  rocr.performance <- performance(prediction.result, measure = "auc", x.measure = "cutoff")
+  perf.tpr.rocr <- performance(prediction.result, "tpr", "fpr")
   
-  filename <- paste0("Plots/", modeltype, "/auc_", modeltype, "_", testset_type, ".png")
-  png(filename)
-  plot(perf.tpr.rocr, colorize=T,main=paste(modeltype, " AUC:",(perf.rocr@y.values)))
+  # Save ROC
+  png(paste0("Plots/", modeltype, "/auc_", modeltype, "_", testset_type, ".png"))
+  plot(perf.tpr.rocr, colorize=T,main=paste(modeltype, " AUC:",(rocr.performance@y.values)))
   abline(a=0, b=1)
   dev.off()
-
-  print(opt.cut(perf.tpr.rocr, pred.rocr))
+  
+  # Close file connection
+  close(fileConn)
 }
 
-opt.cut <- function(perf, pred) {
-  cut.ind <- mapply(FUN=function(x, y, p) {
-    d <- (x - 0)^2 + (y-1)^2
-    ind <- which(d == min(d))
-    c(sensitivity = y[[ind]],
-      specificity = 1-x[[ind]],
-      cutoff = p[[ind]])
-  }, perf@x.values, perf@y.values, pred@cutoffs)
-}
-
+# Support function to execute analysis on the 3 chosen models
 analyze_results <- function(models, testset, testset_type) {
   analyze_result(models[[1]], testset, 'Naive_Bayes', testset_type)
   analyze_result(models[[2]], testset, 'SVM', testset_type)

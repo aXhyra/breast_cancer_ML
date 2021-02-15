@@ -1,46 +1,55 @@
 #Perform PCA and select the most important features (to explain variance)
 
+# trainset: training set
+# testset: test set
+# threshold: threshold of cumulated variance to explain
 compute_pca <- function(trainset, testset, threshold){
   
   library("FactoMineR")
   library("factoextra")
   
+  # Initialize file connection
   fileConn<-file("Logs/PCA/PCA.log")
-
-  res.pca <- prcomp(trainset, center = TRUE, scale = TRUE)
-  eig.val <- get_eigenvalue(res.pca)
-
+  
+  # Perform PCA on centered and scaled dataset
+  pca.results <- prcomp(trainset, center = TRUE, scale = TRUE)
+  eigenvalues <- get_eigenvalue(pca.results)
+  
+  # Save graph about variance of each principal component
   png("Plots/PCA/fviz_eig.png", width=1920, height = 780)
-  print(fviz_eig(res.pca, addlabels = TRUE, ylim = c(0, 50), ncp = 30), vp=grid::viewport(gp=grid::gpar(cex=1.8)))
+  print(fviz_eig(pca.results, addlabels = TRUE, ylim = c(0, 50), ncp = 30), vp=grid::viewport(gp=grid::gpar(cex=1.8)))
   dev.off()
 
+  # Save graph about feature correlation
   png("Plots/PCA/fviz_pca_var.png")
-  print(fviz_pca_var(res.pca, col.var = "black"))
+  print(fviz_pca_var(pca.results, col.var = "black"))
   dev.off()
   
-  var <- get_pca_var(res.pca)
+  # Save coordinates of the features on the principal components
+  var <- get_pca_var(pca.results)
+  write.csv(var$coord,"Logs/PCA/Correlation.log")
 
+  # Select how many principal components use based on the threshold
   x <- 1
-
-  for (i in seq_len(ncol(res.pca$x))) {
-    if(eig.val$cumulative.variance.percent[i] <= threshold){
+  for (i in seq_len(ncol(pca.results$x))) {
+    if(eigenvalues$cumulative.variance.percent[i] <= threshold){
       x <- i
     }
   }
-  print(x)
   
-  write.csv(var$coord,"Logs/PCA/Correlation.log")
-  
+  # Save Eigenvalues and number of used principal components on a file
   writeLines(c("Eigenvalues:",
-               toString(eig.val),
+               toString(eigenvalues),
                "number of principal components used:",
                x),
              fileConn)
   
-  dataset_transformed <- res.pca$x[,1:x]
-  
-  testset <- scale(testset, res.pca$center, res.pca$scale) %*% res.pca$rotation[,1:x]
+  # Created transformed trainset and testset (transformation on the PC spaces)
+  transformed.dataset <- pca.results$x[,1:x]
+  testset <- scale(testset, pca.results$center, pca.results$scale) %*% pca.results$rotation[,1:x]
 
+  # Close file connection
   close(fileConn)
-  return(list(as.data.frame(dataset_transformed),as.data.frame(testset)))
+  
+  return(list(as.data.frame(transformed.dataset),as.data.frame(testset)))
 }
