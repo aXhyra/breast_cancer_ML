@@ -8,7 +8,6 @@ library(e1071)
 library(mlbench)
 library(corrplot)
 
-library(caret)
 library(tidyverse)
 library(ROCR)
 
@@ -16,6 +15,23 @@ source("Models.R")
 source("Metrics.R")
 source("PCA.R")
 source("preprocessing.R")
+
+save_graphics_comparisons  <- function(models, dType){
+  
+  models.comparator = resamples(list(Bayes=models[[1]], SVM = models[[2]], NN = models[[3]]))
+  
+  png(paste0("Plots/comparisons/dotplot_",dType,".png"),width=1350,height=900)
+  print(dotplot(models.comparator))
+  dev.off()
+  
+  png(paste0("Plots/comparisons/bwplot_",dType,".png"),width=1350,height=900)
+  print(bwplot(models.comparator, layout = c(2, 1)))
+  dev.off()
+  
+  png(paste0("Plots/comparisons/splom_",dType,".png"),width=1350,height=900)
+  print(splom(models.comparator))
+  dev.off()
+}
 
 
 #Load dataset
@@ -55,7 +71,7 @@ colnames(testset.std)[1] <- "diagnosis"
 # Compute PCA dataset
 #-----------------------
 
-computed.pca <- compute_pca(trainset[, 2:31], testset[, 2:31], 88)
+computed.pca <- compute_pca(trainset[, 2:31], testset[, 2:31], 99)
 
 trainset.pca <- data.frame(trainset[1], computed.pca[1])
 testset.pca <- data.frame(testset[1], computed.pca[2])
@@ -66,10 +82,18 @@ models.norm <- train_models(trainset.norm, Sys.time(), "Normalized")
 
 analyze_results(models.norm, testset.norm, "Normalized")
 
+save_graphics_comparisons(models.norm, "Normalized")
+
+
 models.std <- train_models(trainset.std, Sys.time(), "Standardized")
 
 analyze_results(models.std, testset.std, "Standardized")
 
+save_graphics_comparisons(models.std, "Standardized")
+
+
 models.pca <- train_models(trainset.pca, Sys.time(), "PCA")
 
 analyze_results(models.pca, testset.pca, "PCA")
+
+save_graphics_comparisons(models.pca, "PCA")

@@ -11,8 +11,11 @@ train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
   #-----------------------
 
   set.seed(seed)
+  
   filename <- paste0("Logs/", mType, "/", modelType, "_", dType, ".log")
-  sink(filename)
+  fileConn<-file(filename)
+  
+  
   
   train_control <- trainControl(method="repeatedcv", #repeated cross validation to decrease variance
                                 number=10, # 10 folds
@@ -36,10 +39,34 @@ train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
                    trControl=train_control)
   }
 
-  cat(toString(model))
+  writeLines(c("method:",
+               model$method,
+               "model:",
+               model$modelInfo$label,
+               "best tuning parameters:",
+               toString(model$modelInfo$parameters$parameter),
+               toString(model$bestTune),
+               "optimized metric:",
+               model$metric,
+               "Time to perform computation (in seconds):",
+               model$times$everything[3]), fileConn)
   
   #-----------------------
-  sink()
+  close(fileConn)
+  
+  predictions <- predict(model, dataset[,! names(dataset) %in% "diagnosis"])
+  result <- confusionMatrix(predictions,
+                            factor(dataset[, "diagnosis"]))$table
+  
+  write.csv(result,paste0("Logs/", mType, "/", modelType, "_", dType, "_finalModel_confusion_matrix.log"))
+  
+  if(mType=="Neural_Network"){
+    filename <- paste0("Logs/", mType, "/", modelType, "_", dType, "_net_info", ".log")
+    fileConn<-file(filename)
+    writeLines(c(model[["finalModel"]][["snnsObject"]]@variables[["serialization"]],"neural net"),fileConn)
+    close(fileConn)
+  }
+  
   return(model)
   
   #-----------------------
@@ -49,10 +76,10 @@ train_models <- function(set, seed, dType) {
   # Initialize processing cluster
   #-----------------------
 
-  library(doParallel)
-  cores <- detectCores()
-  registerDoParallel(cores = cores)
-  cluster <- makeCluster(cores)
+  #library(doParallel)
+  #cores <- detectCores()
+  #registerDoParallel(cores = cores)
+  #cluster <- makeCluster(cores)
 
   source("configuration.R")
 
@@ -78,7 +105,7 @@ train_models <- function(set, seed, dType) {
   #Terminate parallel computing and return outputs
   #-----------------------
 
-  stopCluster(cluster)
+  #stopCluster(cluster)
 
   return(list(Bayes.model, SVM.model, NN.model))
 }

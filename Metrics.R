@@ -26,6 +26,7 @@ analyze_result <- function(model, testset, modeltype, testset_type){
   pred.rocr <- prediction(pred.to.roc, factor(testset$diagnosis))
   perf.rocr <- performance(pred.rocr, measure = "auc", x.measure = "cutoff")
   perf.tpr.rocr <- performance(pred.rocr, "tpr", "fpr")
+  
   filename <- paste0("Plots/", modeltype, "/auc_", modeltype, "_", testset_type, ".png")
   png(filename)
   plot(perf.tpr.rocr, colorize=T,main=paste(modeltype, " AUC:",(perf.rocr@y.values)))

@@ -14,7 +14,7 @@ preprocessing <- function(dataset) {
   diagnosis.prop.df <- as.data.frame(diagnosis.prop.table)
   pielabels <- sprintf("%s - %3.1f%s", diagnosis.prop.df[,1], diagnosis.prop.table, "%")
 
-  png("class_pie.png",width=1350,height=900)
+  png("Data_exploration/nclass_pie.png",width=1350,height=900)
   pie(diagnosis.prop.table,
       labels=pielabels,
       clockwise=TRUE,
@@ -32,7 +32,7 @@ preprocessing <- function(dataset) {
   tmpdataset <- dataset[,2:31]
   scales <- list(x=list(relation="free"), y=list(relation="free"), cex=1)
   # First 15 features
-  png("density_plots_pt1.png",width=958,height=1008)
+  png("Data_exploration/density_plots_pt1.png",width=958,height=1008)
   featurePlot(x=tmpdataset[,1:15],
               y=dataset[,1],
               plot="density",
@@ -42,7 +42,7 @@ preprocessing <- function(dataset) {
               pch="|")
   dev.off()
   # Last 15 features
-  png("density_plots_pt2.png",width=958,height=1008)
+  png("Data_exploration/density_plots_pt2.png",width=958,height=1008)
   featurePlot(x=tmpdataset[,16:30],
               y=dataset[,1],
               plot="density",
@@ -54,7 +54,7 @@ preprocessing <- function(dataset) {
 
   ############################################################
   # Density plots of single variables
-  png("density_plots_tot_pt1.png",width=958,height=1008)
+  png("Data_exploration/density_plots_tot_pt1.png",width=958,height=1008)
   par(mar=c(3,3,3,3))
   par(mfrow=c(5,3))
   for(i in 1:15) {
@@ -63,7 +63,7 @@ preprocessing <- function(dataset) {
   }
   dev.off()
 
-  png("density_plots_tot_pt2.png",width=958,height=1008)
+  png("Data_exploration/density_plots_tot_pt2.png",width=958,height=1008)
   par(mar=c(3,3,3,3))
   par(mfrow=c(5,3))
   for(i in 16:30) {
@@ -74,7 +74,7 @@ preprocessing <- function(dataset) {
 
   ############################################################
   # Boxplots of the first 15 features
-  png("boxplot1.png",width=958,height=1008)
+  png("Data_exploration/boxplot1.png",width=958,height=1008)
   par(mar=c(3,3,3,3))
   par(mfrow=c(5,3))
   for(i in 1:15) {
@@ -84,7 +84,7 @@ preprocessing <- function(dataset) {
   dev.off()
 
   # Boxplots of the last 15 features
-  png("boxplot2.png",width=958,height=1008)
+  png("Data_exploration/boxplot2.png",width=958,height=1008)
   par(mar=c(3,3,3,3))
   par(mfrow=c(5,3))
   for(i in 16:30) {
@@ -100,11 +100,11 @@ preprocessing <- function(dataset) {
     test <- shapiro.test(tmpdataset[,i])
     sw <- rbind(sw,c(round(test$statistic,digits=5),round(test$p.value,digits=5)))
   }
-  write.csv(sw,"sw_test.csv")
+  write.csv(sw,"Data_exploration/sw_test.csv")
 
   ############################################################
   # Correlation matrix
-  png("corrplot.png",width=1920,height=1017)
+  png("Data_exploration/corrplot.png",width=1920,height=1017)
   tmpdataset <- dataset[,2:31]
   correlations <- cor(tmpdataset,method="pearson")
   corrplot(correlations, number.cex = 1, method = "square",
