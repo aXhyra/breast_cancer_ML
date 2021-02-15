@@ -71,15 +71,15 @@ trainset.norm <- data.frame(trainset[,1], # Create normalized trainset patition
                             scale(trainset[,2:31],
                                   cols.min,
                                   (cols.max - cols.min)
-                                  )
                             )
+)
 
 testset.norm <- data.frame(testset[,1], # Create normalized test partition
                            scale(testset[,2:31],
                                  cols.min,
                                  (cols.max - cols.min)
-                                 )
                            )
+)
 
 cols.mean <- apply(trainset[,2:31], 2, mean) # Get mean value for each feature
 cols.std <- apply(trainset[,2:31], 2, sd) # Get standard deviation for each feature distribution
@@ -88,22 +88,22 @@ trainset.std <- data.frame(trainset[,1], # Create standardized train partition
                            scale(trainset[,2:31],
                                  cols.mean,
                                  cols.std)
-                           )
+)
 
 testset.std <- data.frame(testset[,1], # Create standardized test partition
                           scale(testset[,2:31],
                                 cols.mean,
                                 cols.std)
-                          )
+)
 
 # Select not highly correlated features from trainset.std and testset.std (feature reduction)
 trainset.corr <- data.frame(trainset[,1],
                             trainset.std[,2:31][,!(colnames(trainset.std[,2:31]) %in% corr.var)] 
-                           )
+)
 
 testset.corr <- data.frame(testset[,1],
-                            testset.std[,2:31][,!(colnames(testset.std[,2:31]) %in% corr.var)]
-                           )
+                           testset.std[,2:31][,!(colnames(testset.std[,2:31]) %in% corr.var)]
+)
 
 # Rename target column of the created sets
 colnames(trainset.norm)[1] <- "diagnosis"
@@ -141,6 +141,7 @@ save_models_comparisons(models.std, "Standardized")
 models.pca <- train_models(trainset.pca, Sys.time(), "PCA")
 analyze_results(models.pca, testset.pca, "PCA")
 save_models_comparisons(models.pca, "PCA")
+
 
 models.corr <- train_models(trainset.corr, Sys.time(), "Corr")
 analyze_results(models.corr, testset.corr, "Corr")

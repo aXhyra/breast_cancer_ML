@@ -13,7 +13,7 @@ data_exploration <- function(dataset) {
   diagnosis.prop.table <- prop.table(diagnosis.table)*100
   diagnosis.prop.df <- as.data.frame(diagnosis.prop.table)
   pielabels <- sprintf("%s - %3.1f%s", diagnosis.prop.df[,1], diagnosis.prop.table, "%")
-
+  
   png("Plots/Data_exploration/nclass_pie.png",width=1350,height=900)
   pie(diagnosis.prop.table,
       labels=pielabels,
@@ -26,7 +26,7 @@ data_exploration <- function(dataset) {
       main="Diagnosis proportion")
   legend(1, .8, legend=diagnosis.prop.df[,1], cex = 1.6, fill = colors)
   dev.off()
-
+  
   ############################################################
   # Density plots
   tmpdataset <- dataset[,2:31]
@@ -51,7 +51,7 @@ data_exploration <- function(dataset) {
               auto.key=list(columns=2),
               pch="|")
   dev.off()
-
+  
   ############################################################
   # Density plots of single variables
   png("Plots/Data_exploration/density_plots_tot_pt1.png",width=958,height=1008)
@@ -62,7 +62,7 @@ data_exploration <- function(dataset) {
     title(colnames(tmpdataset[i]),line=0.2)
   }
   dev.off()
-
+  
   png("Plots/Data_exploration/density_plots_tot_pt2.png",width=958,height=1008)
   par(mar=c(3,3,3,3))
   par(mfrow=c(5,3))
@@ -71,7 +71,7 @@ data_exploration <- function(dataset) {
     title(colnames(tmpdataset[i]),line=0.2)
   }
   dev.off()
-
+  
   ############################################################
   # Boxplots of the first 15 features
   png("Plots/Data_exploration/boxplot1.png",width=958,height=1008)
@@ -82,7 +82,7 @@ data_exploration <- function(dataset) {
     title(colnames(tmpdataset[i]),line=0.2)
   }
   dev.off()
-
+  
   # Boxplots of the last 15 features
   png("Plots/Data_exploration/boxplot2.png",width=958,height=1008)
   par(mar=c(3,3,3,3))
@@ -92,7 +92,7 @@ data_exploration <- function(dataset) {
     title(colnames(tmpdataset[i]),line=0.2)
   }
   dev.off()
-
+  
   ############################################################
   # Shapiro-wilk test for normality
   sw <- c()
@@ -101,7 +101,7 @@ data_exploration <- function(dataset) {
     sw <- rbind(sw,c(round(test$statistic,digits=5),round(test$p.value,digits=5)))
   }
   write.csv(sw,"Logs/Data_exploration/sw_test.csv")
-
+  
   ############################################################
   # Correlation matrix
   png("Plots/Data_exploration/corrplot.png",width=1920,height=1017)
