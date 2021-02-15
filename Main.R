@@ -21,7 +21,7 @@ source("Models.R")
 source("Metrics.R")
 
 
-#Support function to save comparisons between models
+# Support function to save comparisons between models
 #-----------------------
 
 # models: result of train_models method
@@ -44,72 +44,86 @@ save_models_comparisons  <- function(models, dType){
 }
 
 
-#Load dataset
+# Load dataset
 #-----------------------
 
 data <- read.csv("Breast_cancer/data.csv", stringsAsFactors=F)
 data <- data[,2:32]
 
 
-#Perform data exploration
+# Perform data exploration
 #-----------------------
 
-data_exploration(data)
+corr.var <- data_exploration(data) # Names of highly correlated features
 
 
-#Create training and test partitions
+# Create training and test partitions
 #-----------------------
 
-partition.indexes <- sample(2, nrow(data), replace=TRUE, prob=c(0.8, 0.2)) #Get partitions indexes
-trainset <- data[partition.indexes == 1,] #Create train partition
-testset <- data[partition.indexes == 2,] #Create test partition
+partition.indexes <- sample(2, nrow(data), replace=TRUE, prob=c(0.8, 0.2)) # Get partitions indexes
+trainset <- data[partition.indexes == 1,] # Create train partition
+testset <- data[partition.indexes == 2,] # Create test partition
 
-cols.min <- apply(trainset[,2:31],2,min) #Get min value for each feature
-cols.max <- apply(trainset[,2:31],2,max) #Get max value for each feature
+cols.min <- apply(trainset[,2:31],2,min) # Get min value for each feature
+cols.max <- apply(trainset[,2:31],2,max) # Get max value for each feature
 
-trainset.norm <- data.frame(trainset[,1], #Create normalized trainset patition
+trainset.norm <- data.frame(trainset[,1], # Create normalized trainset patition
                             scale(trainset[,2:31],
                                   cols.min,
                                   (cols.max - cols.min)
                                   )
                             )
 
-testset.norm <- data.frame(testset[,1], #Create normalized test partition
+testset.norm <- data.frame(testset[,1], # Create normalized test partition
                            scale(testset[,2:31],
                                  cols.min,
                                  (cols.max - cols.min)
                                  )
                            )
 
-cols.mean <- apply(trainset[,2:31],2, mean) #Get mean value for each feature
-cols.std <- apply(trainset[,2:31],2, sd) #Get standard deviation for each feature distribution
+cols.mean <- apply(trainset[,2:31], 2, mean) # Get mean value for each feature
+cols.std <- apply(trainset[,2:31], 2, sd) # Get standard deviation for each feature distribution
 
-trainset.std <- data.frame(trainset[,1], #Create standardized train partition
+trainset.std <- data.frame(trainset[,1], # Create standardized train partition
                            scale(trainset[,2:31],
                                  cols.mean,
                                  cols.std)
                            )
 
-testset.std <- data.frame(testset[,1], #Create standardized test partition
+testset.std <- data.frame(testset[,1], # Create standardized test partition
                           scale(testset[,2:31],
                                 cols.mean,
                                 cols.std)
                           )
 
-#Rename target column of the created sets
+# Select not highly correlated features from trainset.std and testset.std (feature reduction)
+trainset.corr <- data.frame(trainset[,1],
+                            trainset.std[,2:31][,!(colnames(trainset.std[,2:31]) %in% corr.var)] 
+                           )
+
+testset.corr <- data.frame(testset[,1],
+                            testset.std[,2:31][,!(colnames(testset.std[,2:31]) %in% corr.var)]
+                           )
+
+# Rename target column of the created sets
 colnames(trainset.norm)[1] <- "diagnosis"
 colnames(testset.norm)[1] <- "diagnosis"
 colnames(trainset.std)[1] <- "diagnosis"
 colnames(testset.std)[1] <- "diagnosis"
-
+colnames(trainset.corr)[1] <- "diagnosis"
+colnames(testset.corr)[1] <- "diagnosis"
 
 # Compute PCA dataset
 #-----------------------
 
 computed.pca <- compute_pca(trainset[, 2:31], testset[, 2:31], 99)
-trainset.pca <- data.frame(trainset[1], computed.pca[1])
-testset.pca <- data.frame(testset[1], computed.pca[2])
 
+trainset.pca <- data.frame(trainset[,1], computed.pca[1])
+testset.pca <- data.frame(testset[,1], computed.pca[2])
+
+# Rename target column of the created sets
+colnames(trainset.pca)[1] <- "diagnosis"
+colnames(testset.pca)[1] <- "diagnosis"
 
 # Perform training, analyze data and compare data for each set
 #-----------------------
