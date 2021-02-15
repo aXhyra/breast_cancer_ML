@@ -111,6 +111,7 @@ data_exploration <- function(dataset) {
            hclust.method = "ward", order = "FPC",
            type = "full", tl.cex=1,tl.col = "black")
   t <- 0.81
-  findCorrelation(correlations, cutoff = t, verbose = TRUE, exact = TRUE, names = TRUE)
+  corr.var <- findCorrelation(correlations, cutoff = t, verbose = TRUE, exact = TRUE, names = TRUE)
+  return(corr.var)
   dev.off()
 }
