@@ -31,15 +31,23 @@ save_models_comparisons  <- function(models, dType){
   formatted.data = resamples(list(Bayes=models[[1]], SVM = models[[2]], NN = models[[3]]))
   
   png(paste0("Plots/comparisons/dotplot_",dType,".png"),width=1350,height=900)
-  print(dotplot(formatted.data))
+  print(dotplot(formatted.data,
+                metric="Accuracy",
+                main="Accuracy comparison",
+                scales=list(cex=1.5)))
   dev.off()
   
   png(paste0("Plots/comparisons/bwplot_",dType,".png"),width=1350,height=900)
-  print(bwplot(formatted.data, layout = c(2, 1)))
+  print(bwplot(formatted.data,
+               metric="Accuracy",
+               main="Accuracy comparison",
+               cex.axis=5,
+               scales=list(cex=1.5)))
   dev.off()
   
   png(paste0("Plots/comparisons/splom_",dType,".png"),width=1350,height=900)
-  print(splom(formatted.data))
+  print(splom(formatted.data,
+              scales=list(cex=1.5)))
   dev.off()
 }
 
@@ -128,21 +136,21 @@ colnames(testset.pca)[1] <- "diagnosis"
 # Perform training, analyze data and compare data for each set
 #-----------------------
 
-models.norm <- train_models(trainset.norm, Sys.time(), "Normalized")
+models.norm <- train_models(trainset.norm, 42, "Normalized")
 analyze_results(models.norm, testset.norm, "Normalized")
 save_models_comparisons(models.norm, "Normalized")
 
 
-models.std <- train_models(trainset.std, Sys.time(), "Standardized")
+models.std <- train_models(trainset.std, 42, "Standardized")
 analyze_results(models.std, testset.std, "Standardized")
 save_models_comparisons(models.std, "Standardized")
 
 
-models.pca <- train_models(trainset.pca, Sys.time(), "PCA")
+models.pca <- train_models(trainset.pca, 42, "PCA")
 analyze_results(models.pca, testset.pca, "PCA")
 save_models_comparisons(models.pca, "PCA")
 
 
-models.corr <- train_models(trainset.corr, Sys.time(), "Corr")
+models.corr <- train_models(trainset.corr, 42, "Corr")
 analyze_results(models.corr, testset.corr, "Corr")
 save_models_comparisons(models.corr, "Corr")

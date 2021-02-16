@@ -36,6 +36,7 @@ compute_pca <- function(trainset, testset, threshold){
       x <- i
     }
   }
+  x = x + 1
   
   # Save Eigenvalues and number of used principal components on a file
   writeLines(c("Eigenvalues:",

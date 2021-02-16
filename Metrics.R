@@ -23,8 +23,6 @@ analyze_result <- function(model, testset, modeltype, testset_type){
   # Save metrics info about predictions in a file
   writeLines(c("Accuracy:",
                result$overall[1],
-               "Kappa:",
-               result$overall[2],
                "Sensitivity:",
                result$byClass[1],
                "Specificity:",
@@ -77,7 +75,7 @@ analyze_results <- function(models, testset, testset_type) {
          legend = c("Naive Bayes",
                     "Support Vector Machine",
                     "Neural Network"),
-         col=c("red","blue","green"))
+         fill = c("red","blue","green"))
   
   abline(a=0, b=1)
   dev.off()

@@ -28,21 +28,11 @@ train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
                                 )
   
   # Ten-fold and parameters tuning
-  if (is.null(tuningGrid)) { # if tuning parameters are specified use them
-    
     model <- train(diagnosis ~.,
                    data=dataset,
                    method=modelType,
                    tuneGrid=tuningGrid,
                    trControl=train_control)
-
-  } else { # default tuning otherwise
-    
-    model <- train(diagnosis ~.,
-                   data=dataset,
-                   method=modelType,
-                   trControl=train_control)
-  }
   
   # Save a report on a file
   writeLines(c("method:",
@@ -99,12 +89,16 @@ train_models <- function(set, seed, dType) {
                              dType)
   
   # Perform Support Vector Machine
+  final.tuning.grid = svm_tuning_grid
+  if(dType=="PCA" | dType =="Corr"){
+    final.tuning.grid = svm_reducted_tuning_grid
+  }
   SVM.model <- train_model(set,
-                         svm_tuning_grid,
-                         "svmPoly",
-                         seed,
-                            "SVM",
-                             dType)
+                           final.tuning.grid,
+                           "svmPoly",
+                           seed,
+                           "SVM",
+                           dType)
 
   # Perform Neural Network
   NN.model <- train_model(set, nn_tuning_grid, 'mlpML', seed,
