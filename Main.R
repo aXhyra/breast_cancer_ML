@@ -59,9 +59,9 @@ source("Configuration.R")
 # dType: type of dataset e.g. normalized, standardized...
 save_models_comparisons  <- function(models, dType){
   
-  formatted.data = resamples(list(Bayes=models[[1]],
-                                  SVM=models[[2]],
-                                  NN=models[[3]]))
+  formatted.data <- resamples(list(Bayes=models[[1]],
+                                   SVM=models[[2]],
+                                   NN=models[[3]]))
   
   png(paste0("Plots/Comparisons/dotplot_",dType,".png"),width=1350,height=900)
   print(dotplot(formatted.data,

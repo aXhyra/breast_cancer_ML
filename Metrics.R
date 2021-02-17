@@ -71,7 +71,7 @@ analyze_result <- function(model, testset, modeltype, testset_type){
              "_",
              testset_type,
              ".png"))
-  s
+
   plot(perf.tpr.rocr,
        colorize=T,
        main=paste(modeltype, " AUC:", (rocr.performance@y.values)))
@@ -86,20 +86,20 @@ analyze_result <- function(model, testset, modeltype, testset_type){
 # Support function to execute analysis on the 3 chosen models
 analyze_results <- function(models, testset, testset_type) {
   
-  res.Naive_Bayes = analyze_result(models[[1]],
-                                   testset,
-                                   'Naive_Bayes',
-                                   testset_type)
+  res.Naive_Bayes <- analyze_result(models[[1]],
+                                    testset,
+                                    'Naive_Bayes',
+                                    testset_type)
   
-  res.SVM = analyze_result(models[[2]],
-                           testset,
-                           'SVM',
-                           testset_type)
+  res.SVM <- analyze_result(models[[2]],
+                            testset,
+                            'SVM',
+                            testset_type)
   
-  res.Neural_Network =analyze_result(models[[3]],
-                                     testset,
-                                     'Neural_Network',
-                                     testset_type)
+  res.Neural_Network <- analyze_result(models[[3]],
+                                       testset,
+                                       'Neural_Network',
+                                       testset_type)
   
   png(paste0("Plots/Comparisons/ROC_models_", testset_type, ".png"))
   
