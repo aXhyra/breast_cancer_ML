@@ -1,11 +1,10 @@
-#This file execute all the project scripts to perform the whole analysis
+# This file executes all the project scripts to perform the whole analysis
 
-#install packages and load libraries and resources
+# install packages and load libraries and resources
 #-----------------------
 
 list.of.packages <- c("ggplot2",
                       "dplyr",
-                      "caret",
                       "e1071",
                       "mlbench",
                       "corrplot",
@@ -13,10 +12,17 @@ list.of.packages <- c("ggplot2",
                       "naivebayes",
                       "ROCR",
                       "kernlab",
-                      "tidyverse",
-                      "factoextra",
-                      "FactoMineR",
-                      "RSNNS")
+                      "RSNNS",
+                      "remotes")
+
+list.of.other.pacakges <- c("FactoMineR",
+                            "caret",
+                            "tidyverse",
+                            "factoextra")
+
+new.packages <- list.of.packages[
+  !(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages, Ncpus=4)
 
 # Try to install CRAN ggrepel
 if (!(require("ggrepel"))) install.packages("ggrepel")
@@ -25,9 +31,10 @@ if (!(require("ggrepel"))) install.packages("ggrepel")
 # https://github.com/slowkow/ggrepel/issues/184
 if (!(require("ggrepel"))) remotes::install_github("slowkow/ggrepel") 
 
-new.packages <- list.of.packages[
-  !(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages, Ncpus = 4)
+
+new.packages <- list.of.other.pacakges[
+  !(list.of.other.pacakges %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages, Ncpus=4)
 
 library(ggplot2)
 library(dplyr)
