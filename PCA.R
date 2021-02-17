@@ -17,12 +17,26 @@ compute_pca <- function(trainset, testset, threshold){
   
   # Save graph about variance of each principal component
   png("Plots/PCA/fviz_eig.png", width=1920, height = 780)
-  print(fviz_eig(pca.results, addlabels = TRUE, ylim = c(0, 50), ncp = 30), vp=grid::viewport(gp=grid::gpar(cex=1.8)))
+  print(fviz_eig(pca.results,
+                 addlabels=TRUE,
+                 ylim=c(0, 50), ncp=30),
+        vp=grid::viewport(gp=grid::gpar(cex=1.8)))
+  
   dev.off()
 
   # Save graph about feature correlation
   png("Plots/PCA/fviz_pca_var.png")
   print(fviz_pca_var(pca.results, col.var = "black"))
+  dev.off()
+  
+  # Saving corrplot pca dataset
+  png("Plots/PCA/corrplot_pca.png", width=1024, height=1024)
+  corrplot(pca.results$rotation,
+           number.cex=1,
+           method="square",
+           type="full",
+           tl.cex=1,
+           tl.col="black")
   dev.off()
   
   # Save coordinates of the features on the principal components
@@ -47,7 +61,9 @@ compute_pca <- function(trainset, testset, threshold){
   
   # Created transformed trainset and testset (transformation on the PC spaces)
   transformed.dataset <- pca.results$x[,1:x]
-  testset <- scale(testset, pca.results$center, pca.results$scale) %*% pca.results$rotation[,1:x]
+  testset <- scale(testset,
+                   pca.results$center,
+                   pca.results$scale) %*% pca.results$rotation[,1:x]
 
   # Close file connection
   close(fileConn)

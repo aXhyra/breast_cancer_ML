@@ -2,8 +2,11 @@
 
 # dataset: dataset used to train the model (training set)
 # tuningGrid: a data frame with possible tuning values
-# modelType: name of the model used choose from the classification models of caret at:
-#            http://topepo.github.io/caret/train-models-by-tag.html#Support_Vector_Machines
+# modelType: name of the model used choose from the classification models
+# of caret at:
+#
+# http://topepo.github.io/caret/train-models-by-tag.html#Support_Vector_Machines
+#
 # seed: seed used for the computation
 # mType: name of the model e.g. Naive_bayes, SVM...
 # dType: type of dataset e.g. normalized, standardized...
@@ -16,15 +19,25 @@ train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
   set.seed(seed)
   
   # Initialize connection with file to write
-  filename <- paste0("Logs/", mType, "/", mType, "_", dType, "_opt_info", ".log")
+  filename <- paste0("Logs/",
+                     mType,
+                     "/",
+                     mType,
+                     "_",
+                     dType,
+                     "_opt_info",
+                     ".log")
+  
   fileConn<-file(filename)
   
   
   # Prepare training settings
-  train_control <- trainControl(method="repeatedcv", #repeated cross validation to decrease variance
+  train_control <- trainControl(method="repeatedcv", # repeated cross validation
+                                                     # to decrease variance
                                 number=10, # 10 folds
                                 repeats=5, # repeat 5 times
-                                classProbs=TRUE # compute class probabilities for the classification model
+                                classProbs=TRUE # compute class probabilities
+                                                # for the classification model
                                 )
   
   # Ten-fold and parameters tuning
@@ -50,19 +63,37 @@ train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
   # Close connection with file
   close(fileConn)
   
-  # Repeat predictions on the train set using the best fit to save the relative confusion matrix
+  # Repeat predictions on the train set using the best fit to save the
+  # relative confusion matrix
   predictions <- predict(model, dataset[,! names(dataset) %in% "diagnosis"])
   result <- confusionMatrix(predictions,
                             factor(dataset[, "diagnosis"]))$table
   
   # Save the confusion matrix
-  write.csv(result,paste0("Logs/", mType, "/", mType, "_", dType, "_finalModel_confusion_matrix_train.log"))
+  write.csv(result,paste0("Logs/",
+                          mType,
+                          "/",
+                          mType,
+                          "_",
+                          dType,
+                          "_finalModel_confusion_matrix_train.log"))
   
-  # In case of neural network save the info about the network (weights, layers and neurons)
+  # In case of neural network save the info about the network
+  # (weights, layers and neurons)
   if(mType=="Neural_Network"){
-    filename <- paste0("Logs/", mType, "/", mType, "_", dType, "_net_info", ".log")
+    filename <- paste0("Logs/",
+                       mType,
+                       "/",
+                       mType,
+                       "_",
+                       dType,
+                       "_net_info",
+                       ".log")
     fileConn<-file(filename)
-    writeLines(c(model[["finalModel"]][["snnsObject"]]@variables[["serialization"]],"neural net"),fileConn)
+    writeLines(c(model[["finalModel"]]
+                      [["snnsObject"]]@variables[["serialization"]],
+                 "neural net"),
+               fileConn)
     close(fileConn)
   }
   

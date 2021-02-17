@@ -7,7 +7,14 @@
 analyze_result <- function(model, testset, modeltype, testset_type){
   
   # Prepare file to write
-  filename <- paste0("Logs/", modeltype, "/", modeltype, "_", testset_type, "_results", ".log")
+  filename <- paste0("Logs/",
+                     modeltype,
+                     "/",
+                     modeltype,
+                     "_",
+                     testset_type,
+                     "_results",
+                     ".log")
   fileConn<-file(filename)
   
   # Make predictions for the test set
@@ -18,7 +25,13 @@ analyze_result <- function(model, testset, modeltype, testset_type){
                             factor(testset[, "diagnosis"]))
   
   # Save confusion matrix in a file
-  write.csv(result$table,paste0("Logs/", modeltype, "/", modeltype, "_", testset_type, "_finalModel_confusion_matrix_test.log"))
+  write.csv(result$table,paste0("Logs/",
+                                modeltype,
+                                "/",
+                                modeltype,
+                                "_",
+                                testset_type,
+                                "_finalModel_confusion_matrix_test.log"))
   
   # Save metrics info about predictions in a file
   writeLines(c("Accuracy:",
@@ -41,13 +54,27 @@ analyze_result <- function(model, testset, modeltype, testset_type){
 
   # Perform ROC
   single.class.probabilities <- probabilistic.predictions[, 2]
-  prediction.result <- prediction(single.class.probabilities, factor(testset$diagnosis))
-  rocr.performance <- performance(prediction.result, measure = "auc", x.measure = "cutoff")
+  prediction.result <- prediction(single.class.probabilities,
+                                  factor(testset$diagnosis))
+  
+  rocr.performance <- performance(prediction.result,
+                                  measure="auc",
+                                  x.measure="cutoff")
+  
   perf.tpr.rocr <- performance(prediction.result, "tpr", "fpr")
   
   # Save ROC
-  png(paste0("Plots/", modeltype, "/auc_", modeltype, "_", testset_type, ".png"))
-  plot(perf.tpr.rocr, colorize=T, main=paste(modeltype, " AUC:",(rocr.performance@y.values)))
+  png(paste0("Plots/",
+             modeltype,
+             "/auc_",
+             modeltype,
+             "_",
+             testset_type,
+             ".png"))
+  s
+  plot(perf.tpr.rocr,
+       colorize=T,
+       main=paste(modeltype, " AUC:", (rocr.performance@y.values)))
   abline(a=0, b=1)
   dev.off()
   
@@ -59,9 +86,20 @@ analyze_result <- function(model, testset, modeltype, testset_type){
 # Support function to execute analysis on the 3 chosen models
 analyze_results <- function(models, testset, testset_type) {
   
-  res.Naive_Bayes = analyze_result(models[[1]], testset, 'Naive_Bayes', testset_type)
-  res.SVM = analyze_result(models[[2]], testset, 'SVM', testset_type)
-  res.Neural_Network =analyze_result(models[[3]], testset, 'Neural_Network', testset_type)
+  res.Naive_Bayes = analyze_result(models[[1]],
+                                   testset,
+                                   'Naive_Bayes',
+                                   testset_type)
+  
+  res.SVM = analyze_result(models[[2]],
+                           testset,
+                           'SVM',
+                           testset_type)
+  
+  res.Neural_Network =analyze_result(models[[3]],
+                                     testset,
+                                     'Neural_Network',
+                                     testset_type)
   
   png(paste0("Plots/Comparisons/ROC_models_", testset_type, ".png"))
   
