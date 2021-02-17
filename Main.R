@@ -56,14 +56,14 @@ save_models_comparisons  <- function(models, dType){
                                   SVM=models[[2]],
                                   NN=models[[3]]))
   
-  png(paste0("Plots/comparisons/dotplot_",dType,".png"),width=1350,height=900)
+  png(paste0("Plots/Comparisons/dotplot_",dType,".png"),width=1350,height=900)
   print(dotplot(formatted.data,
                 metric="Accuracy",
                 main="Accuracy comparison",
                 scales=list(cex=1.5)))
   dev.off()
   
-  png(paste0("Plots/comparisons/bwplot_",dType,".png"),width=1350,height=900)
+  png(paste0("Plots/Comparisons/bwplot_",dType,".png"),width=1350,height=900)
   print(bwplot(formatted.data,
                metric="Accuracy",
                main="Accuracy comparison",
@@ -71,7 +71,7 @@ save_models_comparisons  <- function(models, dType){
                scales=list(cex=1.5)))
   dev.off()
   
-  png(paste0("Plots/comparisons/splom_",dType,".png"),width=1350,height=900)
+  png(paste0("Plots/Comparisons/splom_",dType,".png"),width=1350,height=900)
   print(splom(formatted.data,
               scales=list(cex=1.5)))
   dev.off()
