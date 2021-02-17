@@ -15,7 +15,7 @@ analyze_result <- function(model, testset, modeltype, testset_type){
                      testset_type,
                      "_results",
                      ".log")
-  fileConn<-file(filename)
+  fileConn <- file(filename)
   
   # Make predictions for the test set
   predictions <- predict(model, testset[,! names(testset) %in% "diagnosis"])
@@ -23,7 +23,7 @@ analyze_result <- function(model, testset, modeltype, testset_type){
   # Create confusion matrix
   result <- confusionMatrix(predictions,
                             factor(testset[, "diagnosis"]))
-  
+
   # Save confusion matrix in a file
   write.csv(result$table,paste0("Logs/",
                                 modeltype,

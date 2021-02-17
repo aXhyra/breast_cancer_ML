@@ -28,7 +28,7 @@ train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
                      "_opt_info",
                      ".log")
   
-  fileConn<-file(filename)
+  fileConn <- file(filename)
   
   
   # Prepare training settings
@@ -103,13 +103,13 @@ train_model <- function(dataset, tuningGrid, modelType, seed, mType, dType){
 # Support function to perform train_model with the 3 chosen models
 train_models <- function(set, seed, dType) {
   
-  #library(doParallel)
-  #cores <- detectCores()
-  #registerDoParallel(cores = cores)
-  #cluster <- makeCluster(cores)
+  library(doParallel)
+  cores <- detectCores()
+  registerDoParallel(cores = cores)
+  cluster <- makeCluster(cores)
 
   #import tuning parameters configuration
-  source("configuration.R")
+  source("Configuration.R")
   
   # Perform Naive Bayes
   Bayes.model <- train_model(set,
@@ -120,9 +120,9 @@ train_models <- function(set, seed, dType) {
                              dType)
   
   # Perform Support Vector Machine
-  final.tuning.grid = svm_tuning_grid
+  final.tuning.grid <- svm_tuning_grid
   if(dType=="PCA" | dType =="Corr"){
-    final.tuning.grid = svm_reducted_tuning_grid
+    final.tuning.grid <- svm_reducted_tuning_grid
   }
   SVM.model <- train_model(set,
                            final.tuning.grid,
@@ -136,7 +136,7 @@ train_models <- function(set, seed, dType) {
                             "Neural_Network",
                              dType)
 
-  #stopCluster(cluster)
+  stopCluster(cluster)
 
   return(list(Bayes.model, SVM.model, NN.model))
 }
