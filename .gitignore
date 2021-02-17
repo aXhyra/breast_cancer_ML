@@ -187,5 +187,6 @@ vignettes/*.pdf
 # Plots and Logs
 *.png
 *.log
+*.csv
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,r,intellij
