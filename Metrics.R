@@ -22,7 +22,8 @@ analyze_result <- function(model, testset, modeltype, testset_type){
   
   # Create confusion matrix
   result <- confusionMatrix(predictions,
-                            factor(testset[, "diagnosis"]))
+                            factor(testset[, "diagnosis"]),
+                            positive="M")
 
   # Save confusion matrix in a file
   write.csv(result$table,paste0("Logs/",
@@ -49,17 +50,20 @@ analyze_result <- function(model, testset, modeltype, testset_type){
 
   # Get probabilistic predictions for the test set
   probabilistic.predictions <- predict(model,
-                       testset[, ! names(testset) %in% "diagnosis"],
-                       type = "prob")
+                                       testset[, ! names(testset) %in% "diagnosis"],
+                                       type = "prob")
 
+  #print(probabilistic.predictions)
   # Perform ROC
   single.class.probabilities <- probabilistic.predictions[, 2]
   prediction.result <- prediction(single.class.probabilities,
                                   factor(testset$diagnosis))
-  
+
+
   rocr.performance <- performance(prediction.result,
                                   measure="auc",
-                                  x.measure="cutoff")
+                                  x.measure="cutoff",
+                                  positive="M")
   
   perf.tpr.rocr <- performance(prediction.result, "tpr", "fpr")
   
